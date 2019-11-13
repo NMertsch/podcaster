@@ -20,7 +20,7 @@ Installation
 
 .. code::
 
-    git clone https://gitlab.gwdg.de/niklas.mertsch/podcaster
+    git clone [this repository]
     cd podcaster
     pip install .
 
