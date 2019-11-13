@@ -1,7 +1,9 @@
-podcaster
+Podcaster
 =========
 
 Podcaster is a command line podcast player. It uses `mpv <https://mpv.io/>`_ as media player and stores podcast feeds in a SQLite database.
+
+The general approach is adapted from `podcast-player <https://github.com/aziezahmed/podcast-player/>`_. Please check it out!
 
 Development Status
 ==================
@@ -20,7 +22,7 @@ Installation
 
 .. code::
 
-    git clone https://gitlab.gwdg.de/niklas.mertsch/podcaster
+    git clone [this repository]
     cd podcaster
     pip install .
 
