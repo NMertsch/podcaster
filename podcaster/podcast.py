@@ -1,5 +1,4 @@
-from datetime import datetime
-from time import mktime
+from datetime import datetime as dt
 
 import feedparser
 
@@ -15,18 +14,16 @@ class Podcast:
         if not self.feed:
             raise IOError(f"No podcast feed found at '{self.url}'.")
 
-        self.link = self.feed.link
+        try:
+            self.link = self.feed.link
+        except AttributeError:
+            self.link = url
         self.title = self.feed.title
-        self.date = datetime.fromtimestamp(mktime(self.feed.updated_parsed))
         self.author = self.feed.author
-        self._episodes = None
 
-    @property
-    def episodes(self):
-        if self._episodes is None:
-            # read episodes lazily as generating episode lists on podcast initialization would be slow
-            self._episodes = tuple(Episode(entry) for entry in self.rss.entries)
-        return self._episodes
+        episodes = tuple(Episode(entry) for entry in self.rss.entries)
+        self.episodes = sorted(episodes, key=lambda item: dt.now() - item.date)
+        self.date = self.episodes[0].date
 
     def __str__(self):
         return self.title

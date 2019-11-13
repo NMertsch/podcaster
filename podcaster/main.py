@@ -1,55 +1,93 @@
-"""
-delete: podcast-menu -> delete Podcast object
-- / play: podcast-menu, ordered by date + Quit -> episode-menu, ordered by date + Back + Quit -> play Episode object -> episode menu
-"""
 from datetime import datetime as dt
-from typing import List, Union
+from typing import List, Union, Callable
 
 import PyInquirer
 import click
+from PyInquirer import Separator
 
 from podcaster.db import PodcastDatabase
 from podcaster.episode import Episode
 from podcaster.podcast import Podcast
 
 
-def selection_menu(prompt: str, choices: List[Union[Episode, Podcast]], multiselect: bool = False):
+def date2str(datetime: dt):
+    weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    date = datetime.date()
+    days_passed = (dt.now().date() - date).days
+    if days_passed == 0:
+        ret = "Today"
+    elif days_passed == 1:
+        ret = "Yesterday"
+    elif days_passed < 7:
+        ret = weekdays[date.weekday()]
+    else:
+        ret = str(datetime.date())
+
+    return ret.ljust(10)
+
+
+def selection_menu(prompt: str, choices: List[Union[Episode, Podcast]], multiselect: bool = False, back_function: Callable = None):
     choices_sorted = sorted(choices, key=lambda item: dt.now() - item.date)
-    choices_dict = [dict(name=item.title, value=item) for item in choices_sorted]
+    choice_dicts = [dict(name=f"{date2str(item.date)} - {item.title}", value=item) for item in choices_sorted]
+    choice_dicts += [Separator()]
+    if back_function is not None:
+        choice_dicts += ["Back"]
+    choice_dicts += ["Quit"]
 
     menu_name = "menu"
     answer = PyInquirer.prompt([dict(
         type="checkbox" if multiselect else "list",
         name=menu_name,
         message=prompt,
-        choices=choices_dict,
-    )])[menu_name]
+        choices=choice_dicts,
+    )]).get(menu_name)
 
-    return answer
+    if answer == "Back":
+        back_function()
+    elif answer == "Quit":
+        exit(0)
+    else:
+        return answer
 
 
 @click.group()
 def cli():
+    """Command line podcast player."""
     pass
 
 
-@cli.command()
-def play():
+@cli.command(name="play")
+def play_cmd():
+    """Play podcasts."""
     db = PodcastDatabase()
-    podcasts = db.get_all_podcasts()
+    podcasts = db.get_all_podcasts(print_progress=True)
+    play(podcasts)
+
+
+def play(podcasts):
     if len(podcasts) == 0:
-        print("No podcast available. Use 'podcaster add URLs' first.")
+        print("No podcast available. Use 'podcaster add [URL]' first.")
         return
 
-    podcast = selection_menu(prompt="Select podcast:", choices=podcasts)
-    episode = selection_menu(prompt="Select episode:", choices=podcast.episodes)
-    episode.play()
+    podcast = None
+    while podcast is None:
+        podcast = selection_menu(prompt="Select podcast:", choices=podcasts)
+
+    episode = None
+    while episode is None:
+        episode = selection_menu(prompt="Select episode:", choices=podcast.episodes,
+                                 back_function=lambda: play(podcasts))
+        episode.play()
+        episode = None
 
 
 @cli.command()
 @click.argument("URLs", nargs=-1, required=True)
 def add(urls):
-    """URLs of podcast feeds. Example: podcast-url/feed/mp3"""
+    """
+    Add URLs or podcast feeds to the podcast database.
+    e.g. https://my.podcast/feed/mp3
+    """
     db = PodcastDatabase()
     for url in urls:
         podcast = Podcast(url)
@@ -59,6 +97,7 @@ def add(urls):
 
 @cli.command()
 def delete():
+    """Delete podcasts from the database."""
     db = PodcastDatabase()
     podcasts = selection_menu(prompt="Select podcasts to delete:", choices=db.get_all_podcasts(), multiselect=True)
     for podcast in podcasts:

@@ -1,3 +1,4 @@
+import shutil
 from os.path import expanduser
 
 import sqlalchemy as db
@@ -44,10 +45,17 @@ class PodcastDatabase:
         connection.execute(deletion)
         connection.close()
 
-    def get_all_podcasts(self):
-        selection = db.select([self.podcast_table.c.url])
+    def get_all_podcasts(self, print_progress=False):
+        selection = db.select([self.podcast_table])
         connection = self.engine.connect()
-        podcasts = tuple(Podcast(url) for (url,) in connection.execute(selection))
+        podcasts = list()
+
+        terminal_width = shutil.get_terminal_size(fallback=(80, 20)).columns
+        for i, podcast_entry in enumerate(connection.execute(selection), start=1):
+            if print_progress:
+                opening = f"Fetching podcast {i}: "
+                print("\033[K" + (opening + podcast_entry.title)[:terminal_width], end="\r")  # "\003[K": clear line
+            podcasts.append(Podcast(podcast_entry.url))
         connection.close()
 
-        return podcasts
+        return tuple(podcasts)
