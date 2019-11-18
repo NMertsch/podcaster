@@ -31,8 +31,8 @@ def selection_menu(prompt: str, choices: List[Union[Episode, Podcast]], multisel
     choice_dicts = [dict(name=f"{date2str(item.date)} - {item.title}", value=item) for item in choices_sorted]
     choice_dicts += [Separator()]
     if back_function is not None:
-        choice_dicts += ["Back"]
-    choice_dicts += ["Quit"]
+        choice_dicts += [dict(name="Back")]
+    choice_dicts += [dict(name="Quit")]
 
     menu_name = "menu"
     answer = PyInquirer.prompt([dict(
@@ -77,8 +77,11 @@ def play(podcasts):
     while episode is None:
         episode = selection_menu(prompt="Select episode:", choices=podcast.episodes,
                                  back_function=lambda: play(podcasts))
+        if episode is None:
+            continue
+
         episode.play()
-        episode = None
+        episode = None  # endless loop
 
 
 @cli.command()
@@ -99,7 +102,12 @@ def add(urls):
 def delete():
     """Delete podcasts from the database."""
     db = PodcastDatabase()
-    podcasts = selection_menu(prompt="Select podcasts to delete:", choices=db.get_all_podcasts(), multiselect=True)
+    all_podcasts = db.get_all_podcasts(print_progress=True)
+
+    podcasts = None
+    while podcasts is None:
+        podcasts = selection_menu(prompt="Select podcasts to delete:", choices=all_podcasts, multiselect=True)
+
     for podcast in podcasts:
         db.delete_podcast(podcast)
         print(f"Deleted '{podcast.title}'")
