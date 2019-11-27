@@ -1,53 +1,8 @@
-from datetime import datetime as dt
-from typing import List, Union, Callable
-
-import PyInquirer
 import click
-from PyInquirer import Separator
 
 from podcaster.db import PodcastDatabase
-from podcaster.episode import Episode
 from podcaster.podcast import Podcast
-
-
-def date2str(datetime: dt):
-    weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    date = datetime.date()
-    days_passed = (dt.now().date() - date).days
-    if days_passed == 0:
-        ret = "Today"
-    elif days_passed == 1:
-        ret = "Yesterday"
-    elif days_passed < 7:
-        ret = weekdays[date.weekday()]
-    else:
-        ret = str(datetime.date())
-
-    return ret.ljust(10)
-
-
-def selection_menu(prompt: str, choices: List[Union[Episode, Podcast]], multiselect: bool = False, back_function: Callable = None):
-    choices_sorted = sorted(choices, key=lambda item: dt.now() - item.date)
-    choice_dicts = [dict(name=f"{date2str(item.date)} - {item.title}", value=item) for item in choices_sorted]
-    choice_dicts += [Separator()]
-    if back_function is not None:
-        choice_dicts += [dict(name="Back")]
-    choice_dicts += [dict(name="Quit")]
-
-    menu_name = "menu"
-    answer = PyInquirer.prompt([dict(
-        type="checkbox" if multiselect else "list",
-        name=menu_name,
-        message=prompt,
-        choices=choice_dicts,
-    )]).get(menu_name)
-
-    if answer == "Back":
-        back_function()
-    elif answer == "Quit":
-        exit(0)
-    else:
-        return answer
+from podcaster.utils import selection_menu
 
 
 @click.group()
@@ -60,7 +15,7 @@ def cli():
 def play_cmd():
     """Play podcasts."""
     db = PodcastDatabase()
-    podcasts = db.get_all_podcasts(print_progress=True)
+    podcasts = db.fetch_all_podcasts(print_progress=True)
     play(podcasts)
 
 
@@ -102,7 +57,7 @@ def add(urls):
 def delete():
     """Delete podcasts from the database."""
     db = PodcastDatabase()
-    all_podcasts = db.get_all_podcasts(print_progress=True)
+    all_podcasts = db.fetch_all_podcasts(print_progress=True)
 
     podcasts = None
     while podcasts is None:

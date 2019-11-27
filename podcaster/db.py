@@ -45,7 +45,7 @@ class PodcastDatabase:
         connection.execute(deletion)
         connection.close()
 
-    def get_all_podcasts(self, print_progress=False):
+    def fetch_all_podcasts(self, print_progress=False):
         selection = db.select([self.podcast_table])
         connection = self.engine.connect()
         podcasts = list()
@@ -55,7 +55,13 @@ class PodcastDatabase:
             if print_progress:
                 opening = f"Fetching podcast {i}: "
                 print("\033[K" + (opening + podcast_entry.title)[:terminal_width], end="\r")  # "\003[K": clear line
-            podcasts.append(Podcast(podcast_entry.url))
+
+            try:
+                podcast = Podcast(podcast_entry.url)
+                podcasts.append(podcast)
+            except (TimeoutError, OSError):
+                if print_progress:
+                    print(f"Failed to fetch '{podcast_entry.title}' from {'podcast_entry.url'}")
         connection.close()
 
         return tuple(podcasts)
