@@ -49,8 +49,8 @@ def add(urls):
     db = PodcastDatabase()
     for url in urls:
         podcast = Podcast(url)
-        db.add_podcast(url)
-        print(f"Added '{podcast.title}'")
+        if db.add_podcast(url):
+            print(f"Added '{podcast.title}'")
 
 
 @cli.command()

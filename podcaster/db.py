@@ -1,8 +1,10 @@
 import shutil
 import os
 from os.path import expanduser
+import sys
 
 import sqlalchemy as db
+from sqlalchemy.exc import IntegrityError
 
 import podcaster.config as config
 from podcaster.podcast import Podcast
@@ -37,9 +39,13 @@ class PodcastDatabase:
     def add_podcast(self, url):
         podcast = Podcast(url)
         insertion = self.podcast_table.insert().values(url=url, title=podcast.title)
-        connection = self.engine.connect()
-        connection.execute(insertion)
-        connection.close()
+        with self.engine.connect() as connection:
+            try:
+                connection.execute(insertion)
+            except IntegrityError as ex:
+                print("Failed to add podcast: " + ex._message())
+                return False
+        return True
 
     def delete_podcast(self, podcast: Podcast):
         deletion = self.podcast_table.delete().where(self.podcast_table.c.url == podcast.url)
@@ -50,8 +56,8 @@ class PodcastDatabase:
     def fetch_all_podcasts(self, print_progress=False):
         selection = db.select([self.podcast_table])
         connection = self.engine.connect()
-        podcasts = list()
 
+        podcasts = list()
         terminal_width = shutil.get_terminal_size(fallback=(80, 20)).columns
         for i, podcast_entry in enumerate(connection.execute(selection), start=1):
             if print_progress:
