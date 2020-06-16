@@ -5,9 +5,9 @@ import PyInquirer
 from PyInquirer import Separator
 
 
-def date2str(datetime: dt):
+def date2str(timestamp: dt):
     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    date = datetime.date()
+    date = timestamp.date()
     days_passed = (dt.now().date() - date).days
     if days_passed == 0:
         ret = "Today"
@@ -16,7 +16,7 @@ def date2str(datetime: dt):
     elif days_passed < 7:
         ret = weekdays[date.weekday()]
     else:
-        ret = str(datetime.date())
+        ret = str(timestamp.date())
 
     return ret.ljust(10)
 
