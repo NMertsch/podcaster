@@ -1,4 +1,5 @@
 import shutil
+import os
 from os.path import expanduser
 
 import sqlalchemy as db
@@ -9,6 +10,7 @@ from podcaster.podcast import Podcast
 
 class PodcastDatabase:
     def __init__(self):
+        os.makedirs(expanduser(config.config_dir), exist_ok=True)
         self.db_file = f"sqlite:///{expanduser(config.config_dir)}/{config.database_file}"
         self.engine = db.create_engine(self.db_file)
         self.podcast_table = self.initialize_db()
