@@ -19,7 +19,7 @@ class Episode:
         return self.title
 
     def __repr__(self):
-        return f"Episode({self.url})"
+        return f"Episode({self.rss})"
 
     def play(self):
         os.system(f"mpv --no-video {self.url}")
