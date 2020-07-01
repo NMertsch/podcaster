@@ -7,7 +7,7 @@ from feedparser import FeedParserDict
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import YoutubeDLError
 
-from podcaster.utils import suppress_stderr
+from podcaster.utils import suppress_stderr, play_audio
 
 
 class Episode:
@@ -23,7 +23,7 @@ class Episode:
         return f"Episode({self.rss})"
 
     def play(self):
-        os.system(f"mpv --no-video {self.extract_play_url().split('?')[0]}")
+        play_audio(self.extract_play_url())
 
     def extract_play_url(self):
         # extract possible urls from rss feed

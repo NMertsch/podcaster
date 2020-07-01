@@ -16,6 +16,10 @@ def suppress_stderr():
             yield err
 
 
+def play_audio(url):
+    os.system(f"mpv --no-video {url.split('?')[0]}")
+
+
 def date2str(timestamp: dt):
     weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     date = timestamp.date()
