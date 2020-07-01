@@ -34,7 +34,7 @@ def date2str(timestamp: dt):
 
 def selection_menu(prompt: str, choices: List, multiselect: bool = False, back_function: Callable = None):
     if len(choices) == 0:
-        raise ValueError("No choices given (len(choices) == 0).")
+        raise ValueError("No choices given.")
     if not hasattr(choices[0], "date"):
         raise ValueError("Choices are sorted by their 'date' attribute. Given choice has no date.")
 

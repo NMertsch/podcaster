@@ -42,7 +42,7 @@ class PodcastDatabase:
             try:
                 connection.execute(insertion)
             except IntegrityError as ex:
-                print("Failed to add podcast: " + ex._message())
+                print("Failed to add podcast: " + ex.args[0])
                 return False
         return True
 
