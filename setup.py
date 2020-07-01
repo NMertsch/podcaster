@@ -13,6 +13,7 @@ setup(
         'feedparser',
         'sqlalchemy',
         'PyInquirer',
+        'youtube-dl',
     ],
     entry_points={
         'console_scripts': [

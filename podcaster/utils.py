@@ -1,8 +1,19 @@
+from contextlib import contextmanager, redirect_stderr
 from datetime import datetime as dt
+import os
 from typing import List, Callable
 
 import PyInquirer
 from PyInquirer import Separator
+
+
+@contextmanager
+def suppress_stderr():
+    """A context manager that redirects stdout and stderr to devnull"""
+    # 2020-07-01 https://stackoverflow.com/a/52442331/9568847
+    with open(os.devnull, 'w') as fnull:
+        with redirect_stderr(fnull) as err:
+            yield err
 
 
 def date2str(timestamp: dt):
