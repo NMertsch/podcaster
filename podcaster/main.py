@@ -15,7 +15,7 @@ def cli():
 def play_cmd():
     """Play podcasts."""
     db = PodcastDatabase()
-    podcasts = db.fetch_all_podcasts(print_progress=True)
+    podcasts = db.fetch_all_podcasts()
     play(podcasts)
 
 
@@ -57,7 +57,7 @@ def add(urls):
 def delete():
     """Delete podcasts from the database."""
     db = PodcastDatabase()
-    all_podcasts = db.fetch_all_podcasts(print_progress=True)
+    all_podcasts = db.fetch_all_podcasts()
 
     podcasts = None
     while podcasts is None:

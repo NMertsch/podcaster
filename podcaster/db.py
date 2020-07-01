@@ -1,7 +1,6 @@
-import shutil
 import os
 from os.path import expanduser
-import sys
+from multiprocessing.pool import ThreadPool
 
 import sqlalchemy as db
 from sqlalchemy.exc import IntegrityError
@@ -53,23 +52,18 @@ class PodcastDatabase:
         connection.execute(deletion)
         connection.close()
 
-    def fetch_all_podcasts(self, print_progress=False):
+    def fetch_all_podcasts(self):
         selection = db.select([self.podcast_table])
         connection = self.engine.connect()
+        podcast_urls = [podcast.url for podcast in connection.execute(selection)]
 
-        podcasts = list()
-        terminal_width = shutil.get_terminal_size(fallback=(80, 20)).columns
-        for i, podcast_entry in enumerate(connection.execute(selection), start=1):
-            if print_progress:
-                opening = f"Fetching podcast {i}: "
-                print("\033[K" + (opening + podcast_entry.title)[:terminal_width], end="\r")  # "\003[K": clear line
+        def fetch(url):
+            podcast = Podcast(url)
+            return podcast
 
-            try:
-                podcast = Podcast(podcast_entry.url)
-                podcasts.append(podcast)
-            except (TimeoutError, OSError):
-                if print_progress:
-                    print(f"Failed to fetch '{podcast_entry.title}' from {'podcast_entry.url'}")
-        connection.close()
-
-        return tuple(podcasts)
+        print("Fetching podcasts ...")
+        try:
+            pool = ThreadPool(len(podcast_urls))
+            return pool.map(fetch, podcast_urls)
+        finally:
+            connection.close()
