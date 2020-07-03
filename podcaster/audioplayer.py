@@ -13,6 +13,9 @@ class AudioPlayer:
     def pause_toggle(self):
         self.mpv.cycle("pause")
 
+    def mute_toggle(self):
+        self.mpv.cycle("mute")
+
     def stop(self):
         self.mpv.command("stop")
 
@@ -67,6 +70,10 @@ class AudioPlayer:
     @property
     def is_paused(self):
         return self.mpv.pause
+
+    @property
+    def is_muted(self):
+        return self.mpv.mute
 
     @property
     def speed(self):

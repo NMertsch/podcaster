@@ -16,6 +16,7 @@ class Keys:
     H = ord("h")
     Q = ord("q")
     P = ord("p")
+    M = ord("m")
     ENTER = ord("\n")
     SPACE = ord(" ")
     SQUARE_BRACKET_LEFT = ord("[")
@@ -202,6 +203,8 @@ class EpisodePlayWindow:
                 self.player.speed_down()
             elif c in (Keys.SQUARE_BRACKET_RIGHT,):
                 self.player.speed_up()
+            elif c in (Keys.M,):
+                self.player.mute_toggle()
 
             self.draw()
 
@@ -220,9 +223,20 @@ class EpisodePlayWindow:
         if self.player.is_paused:
             progress_str += " (paused)"
 
-        speed_str = "" if isclose(self.player.speed, 1) else f"Speed: {self.player.speed:.2f}x"
-        volume_string = "" if isclose(self.player.volume, 100) else f"Volume: {int(self.player.volume)} %"
-        status_string = ", ".join([s for s in [volume_string, speed_str] if s])
+        if isclose(self.player.speed, 1):
+            speed_str = ""
+        else:
+            time_left = (self.player.duration - self.player.time) / self.player.speed
+            speed_str = f"Speed: {self.player.speed:.2f}x ({time2str(time_left)} left)"
+
+        if isclose(self.player.volume, 100):
+            volume_str = "(muted)" if self.player.is_muted else ""
+        else:
+            volume_str = f"Volume: {int(self.player.volume)} %"
+            if self.player.is_muted:
+                volume_str += " (muted)"
+
+        status_string = ", ".join([s for s in [volume_str, speed_str] if s])
 
         self.window.addnstr(2, 0, progress_str, self.width)
         self.window.addnstr(3, 0, status_string, self.width)
