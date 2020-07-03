@@ -12,7 +12,8 @@ class Podcast:
         self.feed = self.rss.feed
 
         if not self.feed:
-            raise IOError(f"No podcast feed found at '{self.url}'.")
+            msg = f"No podcast feed found at '{self.url}'."
+            raise IOError(msg)
 
         try:
             self.link = self.feed.link

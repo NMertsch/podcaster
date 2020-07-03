@@ -12,8 +12,8 @@ setup(
         'click',
         'feedparser',
         'sqlalchemy',
-        'PyInquirer',
         'youtube-dl',
+        'python-mpv',
     ],
     entry_points={
         'console_scripts': [

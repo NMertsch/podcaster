@@ -1,6 +1,6 @@
 import os
-from os.path import expanduser
 from multiprocessing.pool import ThreadPool
+from os.path import expanduser
 
 import sqlalchemy as db
 from sqlalchemy.exc import IntegrityError
@@ -58,12 +58,15 @@ class PodcastDatabase:
         podcast_urls = [podcast.url for podcast in connection.execute(selection)]
 
         def fetch(url):
-            podcast = Podcast(url)
-            return podcast
+            try:
+                return Podcast(url)
+            except IOError:
+                return None
 
         print("Fetching podcasts ...")
         try:
             pool = ThreadPool(len(podcast_urls))
-            return pool.map(fetch, podcast_urls)
+            podcasts = pool.map(fetch, podcast_urls)
+            return [podcast for podcast in podcasts if podcast is not None]
         finally:
             connection.close()

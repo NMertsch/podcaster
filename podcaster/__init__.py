@@ -1,3 +1,4 @@
+from podcaster.audioplayer import AudioPlayer
 from podcaster.db import PodcastDatabase
-from podcaster.podcast import Podcast
 from podcaster.episode import Episode
+from podcaster.podcast import Podcast

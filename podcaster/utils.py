@@ -1,10 +1,11 @@
+import os
 from contextlib import contextmanager, redirect_stderr
 from datetime import datetime as dt
-import os
-from typing import List, Callable
+from typing import Any
 
-import PyInquirer
-from PyInquirer import Separator
+
+def notify(title: Any, message: Any = ""):
+    os.system(f"notify-send '{title}' '{message}' >/dev/null")
 
 
 @contextmanager
@@ -14,10 +15,6 @@ def suppress_stderr():
     with open(os.devnull, 'w') as fnull:
         with redirect_stderr(fnull) as err:
             yield err
-
-
-def play_audio(url):
-    os.system(f"mpv --no-video {url.split('?')[0]}")
 
 
 def date2str(timestamp: dt):
@@ -36,30 +33,9 @@ def date2str(timestamp: dt):
     return ret.ljust(10)
 
 
-def selection_menu(prompt: str, choices: List, multiselect: bool = False, back_function: Callable = None):
-    if len(choices) == 0:
-        raise ValueError("No choices given.")
-    if not hasattr(choices[0], "date"):
-        raise ValueError("Choices are sorted by their 'date' attribute. Given choice has no date.")
-
-    choices_sorted = sorted(choices, key=lambda item: dt.now() - item.date)
-    choice_dicts = [dict(name=f"{date2str(item.date)} - {item.title}", value=item) for item in choices_sorted]
-    choice_dicts += [Separator()]
-    if back_function is not None:
-        choice_dicts += [dict(name="Back")]
-    choice_dicts += [dict(name="Quit")]
-
-    menu_name = "menu"
-    answer = PyInquirer.prompt([dict(
-        type="checkbox" if multiselect else "list",
-        name=menu_name,
-        message=prompt,
-        choices=choice_dicts,
-    )]).get(menu_name)
-
-    if answer == "Back":
-        back_function()
-    elif answer == "Quit":
-        exit(0)
-    else:
-        return answer
+def time2str(seconds: float):
+    minutes, seconds = divmod(int(seconds), 60)
+    hours, minutes = divmod(minutes, 60)
+    if hours:
+        return f"{hours}:{minutes:02d}:{seconds:02d}"
+    return f"{minutes}:{seconds:02d}"

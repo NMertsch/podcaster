@@ -1,5 +1,4 @@
 from datetime import datetime
-import os
 from operator import itemgetter
 from time import mktime
 
@@ -7,7 +6,7 @@ from feedparser import FeedParserDict
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import YoutubeDLError
 
-from podcaster.utils import suppress_stderr, play_audio
+from podcaster.utils import suppress_stderr
 
 
 class Episode:
@@ -21,9 +20,6 @@ class Episode:
 
     def __repr__(self):
         return f"Episode({self.rss})"
-
-    def play(self):
-        play_audio(self.extract_play_url())
 
     def extract_play_url(self):
         # extract possible urls from rss feed
@@ -54,3 +50,7 @@ class Episode:
                 if 'url' in info_dict:
                     return info_dict['url']
         raise RuntimeError("Failed to find a url to the audio/video file")
+
+    @property
+    def url(self):
+        return self.extract_play_url()

@@ -1,8 +1,8 @@
 import click
 
+from podcaster import Podcast
 from podcaster.db import PodcastDatabase
-from podcaster.podcast import Podcast
-from podcaster.utils import selection_menu
+from podcaster.gui import GUI
 
 
 @click.group()
@@ -16,27 +16,7 @@ def play_cmd():
     """Play podcasts."""
     db = PodcastDatabase()
     podcasts = db.fetch_all_podcasts()
-    play(podcasts)
-
-
-def play(podcasts):
-    if len(podcasts) == 0:
-        print("No podcast available. Use 'podcaster add [URL]' first.")
-        return
-
-    podcast = None
-    while podcast is None:
-        podcast = selection_menu(prompt="Select podcast:", choices=podcasts)
-
-    episode = None
-    while episode is None:
-        episode = selection_menu(prompt="Select episode:", choices=podcast.episodes,
-                                 back_function=lambda: play(podcasts))
-        if episode is None:
-            continue
-
-        episode.play()
-        episode = None  # endless loop
+    GUI(podcasts)
 
 
 @cli.command()
@@ -51,18 +31,3 @@ def add(urls):
         podcast = Podcast(url)
         if db.add_podcast(url):
             print(f"Added '{podcast.title}'")
-
-
-@cli.command()
-def delete():
-    """Delete podcasts from the database."""
-    db = PodcastDatabase()
-    all_podcasts = db.fetch_all_podcasts()
-
-    podcasts = None
-    while podcasts is None:
-        podcasts = selection_menu(prompt="Select podcasts to delete:", choices=all_podcasts, multiselect=True)
-
-    for podcast in podcasts:
-        db.delete_podcast(podcast)
-        print(f"Deleted '{podcast.title}'")
