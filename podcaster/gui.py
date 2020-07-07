@@ -54,15 +54,16 @@ class GUI:
         self.screen.noutrefresh()
 
     def select_podcast(self):
-        self.draw_title("Select podcast:")
 
         podcast_strings = [f"{date2str(podcast.date)} - {podcast.title}" for podcast in self.podcasts]
         selection_entries = podcast_strings + [self.SEPARATOR, self.QUIT]
         podcast_selector = SelectionPad((1, 0), (self.height, self.width), selection_entries)
 
         while True:
-            selected_index = podcast_selector.run()
             self.screen.clear()
+            self.screen.refresh()
+            self.draw_title("Select podcast:")
+            selected_index = podcast_selector.run()
 
             selected_entry = selection_entries[selected_index]
             if selected_entry == self.QUIT:
@@ -76,15 +77,15 @@ class GUI:
                 return
 
     def select_episodes(self, podcast: Podcast):
-        self.draw_title("Select episode:")
-
         episode_strings = [f"{date2str(episode.date)} - {episode.title}" for episode in podcast.episodes]
         selection_entries = episode_strings + [self.SEPARATOR, self.BACK, self.QUIT]
         episode_selector = SelectionPad((1, 0), (self.height, self.width), selection_entries)
 
         while True:
-            selected_index = episode_selector.run()
             self.screen.clear()
+            self.screen.refresh()
+            self.draw_title("Select episode:")
+            selected_index = episode_selector.run()
 
             selected_entry = selection_entries[selected_index]
             if selected_entry == self.BACK:
@@ -93,14 +94,13 @@ class GUI:
                 return self.QUIT
             episode = podcast.episodes[selected_index]
 
-            ret = self.play(podcast, episode)
-            if ret == self.QUIT:
-                return self.QUIT
+            self.play(podcast, episode)
 
     def play(self, podcast: Podcast, episode: Episode):
+        self.screen.clear()
         self.draw_title(f"{podcast.title}")
         player = EpisodePlayWindow((1, 0), (self.height, self.width), episode)
-        return player.run()
+        player.run()
 
 
 class SelectionPad:
@@ -190,7 +190,7 @@ class EpisodePlayWindow:
                 self.player.pause_toggle()
             elif c in (Keys.Q, Keys.ESC):
                 self.player.quit()
-                return GUI.QUIT
+                return
             elif c in (Keys.LEFT, Keys.H):
                 self.player.backward()
             elif c in (Keys.RIGHT, Keys.L):
@@ -223,7 +223,7 @@ class EpisodePlayWindow:
         if self.player.is_paused:
             progress_str += " (paused)"
 
-        if isclose(self.player.speed, 1):
+        if isclose(self.player.speed, 1) or self.player.duration is None:
             speed_str = ""
         else:
             time_left = (self.player.duration - self.player.time) / self.player.speed
