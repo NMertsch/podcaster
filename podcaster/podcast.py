@@ -15,10 +15,6 @@ class Podcast:
             msg = f"No podcast feed found at '{self.url}'."
             raise IOError(msg)
 
-        try:
-            self.link = self.feed.link
-        except AttributeError:
-            self.link = url
         self.title = self.feed.title
         self.author = self.feed.author
 

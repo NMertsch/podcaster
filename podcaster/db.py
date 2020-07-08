@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 import podcaster.config as config
 from podcaster.podcast import Podcast
+from podcaster.utils import notify
 
 
 class PodcastDatabase:
@@ -61,6 +62,10 @@ class PodcastDatabase:
             try:
                 return Podcast(url)
             except IOError:
+                notify(f"Failed to read {url}")
+                return None
+            except AttributeError as err:
+                notify(f"Failed to read podcast from {url}:", err)
                 return None
 
         print("Fetching podcasts ...")
