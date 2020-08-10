@@ -1,21 +1,30 @@
 Podcaster
 =========
 
-Podcaster is a command line podcast player. It uses `mpv <https://mpv.io/>`_ as media player and stores podcast feeds in a SQLite database.
+Podcaster is a command line podcast player. It uses `mpv <https://mpv.io/>`_ as media player.
 
-The general approach is adapted from `podcast-player <https://github.com/aziezahmed/podcast-player/>`_. Please check it out!
+How it works:
 
-Development Status
-==================
+- read podcast RSS feeds from :code:`~/.config/podcaster.conf`
+- parse them using the `feedparser <https://github.com/kurtmckee/feedparser>`_ library
+- user selects podcast and episode using a `curses <https://docs.python.org/3/library/curses.html>`_ interface
+- extract audio file URL via `youtube-dl <https://github.com/ytdl-org/youtube-dl>`_
+- play via `python-mpv <https://github.com/jaseg/python-mpv>`_
 
-The state of this project is well described by "kinda works for me". Contributions are always welcome.
+For a more versatile and feature-complete program, check out `podcast-player <https://github.com/aziezahmed/podcast-player/>`_ or `castero <https://github.com/xgi/castero>`_.
 
-- No Windows support
-- No configuration
-- No documentation
-- No error handling
-- No tests
-- No convenience-functions like playing multiple episodes
+Requirements
+============
+
+- :code:`python`, version 3.6 or later
+- :code:`pip` as package manager for Python
+- Python packages are automatically installed via :code:`setup.py`
+- :code:`libmpv` must be available for :code:`python-mpv` to work
+- :code:`notify-send` must be available for error notifications
+
+Debian/Ubuntu:
+
+- :code:`apt install python3 python3-pip libmpv1 libnotify-bin`
 
 Installation
 ============
@@ -23,28 +32,32 @@ Installation
 .. code::
 
     git clone [this repository]
-    cd podcaster
+    cd podcaster/
     pip install .
 
 Usage
 =====
 
+Add URLs to RSS feeds of your favourite podcasts to :code:`~/.config/podcaster.conf` like this (comments and blank lines are optional):
+
 .. code::
 
-    podcaster add URL  # saves podcast(s) to database
-    podcaster play     # opens menu to select podcast and episode
-    podcaster delete   # opens menu to select podcast(s) to remove from database
+    # Python-specific
+    https://realpython.com/podcasts/rpp/feed
+    http://feeds.soundcloud.com/users/soundcloud:users:82237854/sounds.rss  # import this
 
-Dependencies
-============
+    # AI
+    https://lexfridman.com/category/ai/feed/
 
-These are automatically installed when using `pip` to install podcaster:
+    # General
+    https://feeds.simplecast.com/XA_851k3  # stack overflow podcast
 
-- `click <https://github.com/pallets/click>`_ - Python composable command line interface toolkit
-- `feedparser <https://github.com/kurtmckee/feedparser>`_ - Parse Atom and RSS feeds in Python
-- `sqlalchemy <https://github.com/sqlalchemy/sqlalchemy>`_ - The Database Toolkit for Python
-- `PyInquirer <https://github.com/CITGuru/PyInquirer>`_ - A Python module for common interactive command line user interfaces
+Then use :code:`podcaster` from the terminal.
 
-This needs to be installed separately using your system's package manager:
+Details
+=======
 
-- `mpv <https://mpv.io>`_ - a free, open source, and cross-platform media player
+- Should work on any Linux system, tested on Ubuntu 20.04
+- Might work on Windows, besides the desktop notification (`this <https://github.com/vaskovsky/notify-send>`_ might be useful)
+- The podcast list file is specified in :code:`config.py`
+- The curses interface is not very elaborate and quite fragile. I might fix that later. Pull requests are welcome

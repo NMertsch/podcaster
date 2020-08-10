@@ -5,7 +5,9 @@ from math import isclose
 from operator import attrgetter
 from typing import Tuple, List
 
-from podcaster import Podcast, Episode, AudioPlayer
+from podcaster.audioplayer import AudioPlayer
+from podcaster.episode import Episode
+from podcaster.podcast import Podcast
 from podcaster.utils import date2str, time2str
 
 

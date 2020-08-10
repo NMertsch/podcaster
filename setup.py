@@ -9,15 +9,13 @@ setup(
     packages=['podcaster'],
     license='MIT',
     install_requires=[
-        'click',
         'feedparser',
-        'sqlalchemy',
         'youtube-dl',
         'python-mpv',
     ],
     entry_points={
         'console_scripts': [
-            'podcaster=podcaster.main:cli',
+            'podcaster=podcaster.main:main',
         ]
     },
 )

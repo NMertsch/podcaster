@@ -6,7 +6,8 @@ class AudioPlayer:
         self.mpv = mpv.MPV(video=False, ytdl=True)
 
     def play(self, url):
-        if self.mpv.pause:
+        # MPV can be in paused-state without playing anything. `play` would then start and immediately pause.
+        if self.is_paused:
             self.pause_toggle()
         self.mpv.play(url)
 
@@ -41,7 +42,7 @@ class AudioPlayer:
     def backward(self, seconds=10):
         self.mpv.seek(-1 * seconds)
 
-    def change_volume(self, percent):
+    def _change_volume(self, percent):
         new_volume = self.mpv.volume + percent
         if new_volume > self.mpv.volume_max:
             new_volume = self.mpv.volume_max
@@ -50,10 +51,10 @@ class AudioPlayer:
         self.mpv["volume"] = new_volume
 
     def volume_up(self, percent=10):
-        self.change_volume(percent)
+        self._change_volume(percent)
 
     def volume_down(self, percent=10):
-        self.change_volume(-1 * percent)
+        self._change_volume(-1 * percent)
 
     @property
     def time(self):
