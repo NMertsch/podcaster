@@ -138,11 +138,11 @@ class SelectionPad:
                     self.current_index -= 2
                 else:
                     self.current_index -= 1
-            elif self.has_back_option and c in (Keys.ESC, Keys.H):
+            elif self.has_back_option and c in (Keys.ESC, Keys.H, Keys.LEFT):
                 return self.entries.index(GUI.BACK)
             elif c in (Keys.Q, Keys.ESC):
                 return self.entries.index(GUI.QUIT)
-            elif c in (Keys.ENTER, Keys.L):
+            elif c in (Keys.ENTER, Keys.L, Keys.RIGHT):
                 return self.current_index
             self.draw()
 

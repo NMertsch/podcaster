@@ -54,6 +54,40 @@ Add URLs to RSS feeds of your favourite podcasts to :code:`~/.config/podcaster.c
 
 Then use :code:`podcaster` from the terminal.
 
+Keybindings
+===========
+
+- Selection menu
+    - up, down, j, k: navigation
+    - return, right, l: select
+    - escape, left, h: back
+    - q: quit
+- Audio player
+    - left, right, h, l: forward/backward seek
+    - space, p: pause
+    - up, down, j, k: volume up/down
+    - [, ]: playback speed up/down
+    - espace, q: quit
+
+Screenshots
+===========
+
+.. figure:: screenshots/initial.png
+
+    Fetching...
+
+.. figure:: screenshots/podcasts.png
+
+    Select podcast
+
+.. figure:: screenshots/episodes.png
+
+    Select episode
+
+.. figure:: screenshots/player.png
+
+    Play episode
+
 Details
 =======
 
