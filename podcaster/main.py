@@ -20,7 +20,7 @@ def main():
         if args.debug:
             raise
         else:
-            print(ex)
+            print("Error:", ex)
 
 
 if __name__ == '__main__':
