@@ -16,7 +16,11 @@ class Podcast:
             raise IOError(msg)
 
         self.title = self.feed.title
-        self.author = self.feed.author
+
+        if hasattr(self.feed, "author"):
+            self.author = self.feed.author
+        else:
+            self.author = "Unknown"
 
         episodes = tuple(Episode(entry) for entry in self.rss.entries)
         self.episodes = sorted(episodes, key=lambda item: dt.now() - item.date)
