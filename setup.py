@@ -12,6 +12,7 @@ setup(
         'feedparser',
         'youtube-dl',
         'python-mpv',
+        'windows-curses; sys_platform == "win32"',
     ],
     entry_points={
         'console_scripts': [
