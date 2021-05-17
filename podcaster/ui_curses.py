@@ -166,7 +166,7 @@ class SelectionPad:
             self.pad.addnstr(i, 0, entry, self.width, mode)
 
         # noinspection PyArgumentList
-        self.pad.noutrefresh(self.item_offset, 0, *self.top_left, self.win_height, self.width)
+        self.pad.noutrefresh(self.item_offset, 0, *self.top_left, self.win_height, self.width-1)
         curses.doupdate()
 
 
